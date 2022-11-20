@@ -37,3 +37,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
+
+### Allowlists
+These types of contract addreses are allowed to interact with the smart contract in the program. Allowlists protect your project from undesireable activity., they restrict access to specific addresses, HTTP headers ``User-Agent`` and ``Origin``, and API request methods.
+
