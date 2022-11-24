@@ -10,3 +10,11 @@ import "@openzepplin/contracts/security/ReentracncyGuard.sol";
 //*and doing shady things to prevent reentrancy attacks
 
 //Todo: Declare the contract
+//Todo: Declare the contract
+contract NHLMarket is ReentracncyGuard {
+    using Counterss for Counters.Counter;
+    Counters.Counter private _itemIds;
+    Counters.Counter private _itemsSold;
+
+
+}
