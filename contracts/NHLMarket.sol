@@ -32,6 +32,32 @@ contract NHLMarket is ReentracncyGuard {
         uint256 price;  // price
         bool sold; // wether its sold or not
     }
+      
+    function getListingPrice() public view returns(uint256) {
+    return listingPrice;
+    }
+
+    function createMarketItem(
+        address nftContract,
+        uint256 tokenId,
+        uint256 price
+    ) public payable nonReentrant {
+        require(price > 0, "Price must be at least 1 wei"); //we dont want items listed for free
+        require(msg.value = listingPrice, "Price must be equal to listing price");
+
+        _itemIds.increment();
+        uint256 itemId = _itemIds.current();
+
+//create the market item, set the market value
+    idToMarketItem[itemId] = MarketItem(
+        itemId,
+        nftContract,
+        tokenId,
+        payable(msg.sender),
+        payable(address(0)),
+        price,
+        false
+    );
 
     mapping(uint256 => MarkettItem) private idToMarketItem;
     //keeping up with the items that have beeen created
