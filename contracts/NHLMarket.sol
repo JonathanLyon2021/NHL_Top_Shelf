@@ -16,5 +16,12 @@ contract NHLMarket is ReentracncyGuard {
     Counters.Counter private _itemIds;
     Counters.Counter private _itemsSold;
 
+     address payable owner; // create a variable to set the owner of the project
+    uint256 listingPrice = 0.25 ether;
+
+    constructor () {
+        owner = payable(msg.sender);
+    } //*This is basically saying the owner of this contract is the person who deployed it
+    
 
 }
