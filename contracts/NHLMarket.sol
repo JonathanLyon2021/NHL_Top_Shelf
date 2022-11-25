@@ -23,5 +23,19 @@ contract NHLMarket is ReentracncyGuard {
         owner = payable(msg.sender);
     } //*This is basically saying the owner of this contract is the person who deployed it
     
+ struct MarketItem {
+        uint itemId;
+        address nftContract;
+        uint256 tokenId;
+        address payable seller; // address for the seller
+        address payable owner; // address for the owner
+        uint256 price;  // price
+        bool sold; // wether its sold or not
+    }
 
+    mapping(uint256 => MarkettItem) private idToMarketItem;
+    //keeping up with the items that have beeen created
+
+   
+    );
 }
