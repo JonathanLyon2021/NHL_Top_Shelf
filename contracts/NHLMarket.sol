@@ -62,14 +62,5 @@ contract NHLMarket is ReentracncyGuard {
     mapping(uint256 => MarkettItem) private idToMarketItem;
     //keeping up with the items that have beeen created
 
-    //Todo: create/emit an event for when an item is created, that way we can listen to events from front-end
-    event MarketItemCreated (
-        uint indexed itemId,
-        address indexed nftContract,
-        uint256 indexed tokenId,
-        address seller,
-        address owner,
-        uint256 price,
-        bool sold
-    );
+   //IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 }
