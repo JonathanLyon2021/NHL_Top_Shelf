@@ -80,6 +80,7 @@ contract NHLMarket is ReentracncyGuard {
         _itemsSold.increment();
         payable(owner).transfer(listingPrice);
     } 
+    
     function fetchMarketItems() public view returns (MarketItem[] memory) {
         uint itemCount = _itemIds.current();
         uint unsoldItemCount = _itemIds.current() - _itemsSold.current();
@@ -97,5 +98,6 @@ contract NHLMarket is ReentracncyGuard {
         return items;
     }
 
+    
     
 }
