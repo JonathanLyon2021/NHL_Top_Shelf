@@ -55,6 +55,36 @@ export default function Home() {
 		);
 		setNfts(items);
 		setLoadingState("loaded"); //set loading state to loaded
-		
 	}
+	
+	async function buyNft(nft) {
+		//web3Modal connects to the wallet
+		const web3Modal = new Web3Modal();
+		const connection = await web3Modal.connect();
+		const provider = new ethers.providers.Web3Provider(connection);
+
+		const signer = provider.getSigner();
+		const contract = new ethers.Contract(
+			nftmarketaddress,
+			Market.abi,
+			signer
+		);
+
+		const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
+
+		const transaction = await contract.createMarketSale(
+			nftaddress,
+			nft.tokenId,
+			{
+				value: price,
+			}
+		);
+		await transaction.wait();
+		loadNFTs(); //this should show the nft's that are not sold, technically speaking one's that are "still available to purchase"
+	}
+	
+	if (loadingState === "loaded" && !nfts.length)
+		return (
+			<h1 className="px-20 py-10 text-3xl">No items in marketplace</h1>
+		);
 }
