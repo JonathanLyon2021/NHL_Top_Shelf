@@ -3,6 +3,14 @@ This is a Dapp that I based off of NBA's Top Shot blockchain-based virtual tradi
 
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+The libraries used in this app are:
+ethers \n
+hardhat \n
+ethereum-waffle \n
+chai \n 
+web3modal \n
+axios \n
+ipfs-http-client \n
 
 ## Getting Started
 
