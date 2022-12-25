@@ -16,6 +16,15 @@ The libraries used in this app are:
 *@nomiclabs/hardhat-ethers
 *openzeppelin/contracts
 
+** Dev Dependency installs
+`npm install`
+*tailwindcss@latest
+*postcss@latest
+*autoprefixer@latest
+
+Then after you install them run this command which creates two files that we'll need: A Tailwind CSS config file and a postcss.config.js
+`npx tailwindcss init -p`
+
 ## Getting Started
 
 First, run the development server:
