@@ -52,7 +52,7 @@ export default function CreateItem() {
 		}
 	}
 
-	
+		//creating the sale connecting to the wallet with web3modal
 	async function createSale() {
 		
 		const web3Modal = new Web3Modal();
@@ -60,13 +60,12 @@ export default function CreateItem() {
 		const provider = new ethers.providers.Web3Provider(connection);
 		const signer = provider.getSigner();
 
-		//why are we interacting with two contracts here?
 		let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
 		let transaction = await contract.createToken(url);
 		let tx = await transaction.wait();
 
 		let event = tx.events[0];
-		let value = event.args[2]; //args[2]???? what is the 3rd position of args about??? : Jason
+		let value = event.args[2]; 
 		let tokenId = value.toNumber();
 
 		const price = ethers.utils.parseUnits(formInput.price, 'ether');
@@ -76,8 +75,10 @@ export default function CreateItem() {
 		listingPrice = listingPrice.toString();
 
 		transaction = await contract.createMarketItem(nftaddress, tokenId, price, { value: listingPrice });
-
+		await transaction.wait();
+		router.push('/');
 	}
+	
 	return (
 		<div>
         <Navbar />
