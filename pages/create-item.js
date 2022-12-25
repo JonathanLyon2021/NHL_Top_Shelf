@@ -34,6 +34,25 @@ export default function CreateItem() {
 		}
 	}
 	
+		//listing them item for sale
+	async function createItem() {
+		const { name, description, price } = formInput;
+		if (!name || !description || !price || !fileUrl) return;
+		const data = JSON.stringify({
+			name, description, image: fileUrl
+		})
+
+		try {
+			const added = await client.add(data);
+			const url = `https://ipfs.infura.io/ipfs/${added.path}`
+			*/ after file is uploaded to IPFS, pass the URL to save it on Polygon*/
+			createSale(url);
+		} catch (e) {
+			console.log('Error uploading file: ', e)
+		}
+	}
+
+	
 	async function createSale() {
 		
 		const web3Modal = new Web3Modal();
