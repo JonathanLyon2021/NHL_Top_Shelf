@@ -4,7 +4,6 @@ import Web3Modal from "web3modal";
 import {useRouter} from 'next/router';
 import {create as ipfsHttpClient} from 'ipfs-http-client';
 import Link from "next/link";
-import Navbar from "../components/navbar";
 
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
 
@@ -116,7 +115,6 @@ export default function CreateItem() {
 					Create Digital Asset
 				 </button>
 			</div>
-        <Navbar />
 				<p className="text-4xl font-bold">Create an NFT</p>
 		</div>
 	);
