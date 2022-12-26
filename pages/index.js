@@ -15,7 +15,7 @@ export default function Home() {
 	useEffect(() => {
 		loadNFTs();
 	}, []);
-  
+
 	async function loadNFTs() {
 		const provider = new ethers.providers.JsonRpcProvider();
 		const tokenContract = new ethers.Contract(
@@ -29,7 +29,7 @@ export default function Home() {
 			provider
 		);
 		const data = await marketContract.fetchMarketItems();
-		
+
 		//this is a json representation from ipfs for instanceof(description, image, name, etc.)
 		const items = await Promise.all(
 			data.map(async (i) => {
@@ -39,7 +39,7 @@ export default function Home() {
 					i.price.toString(),
 					"ether"
 				);
-				//we are setting this stuff to the item
+				//We are mapping over the items array, setting this stuff to the item.
 				let item = {
 					price,
 					tokenId: i.tokenId.toNumber(),
@@ -52,10 +52,10 @@ export default function Home() {
 				return item;
 			})
 		);
-		setNfts(items);
+		setNfts(items); // sets the new 
 		setLoadingState("loaded"); //set loading state to loaded
 	}
-	
+
 	async function buyNft(nft) {
 		//web3Modal connects to the wallet
 		const web3Modal = new Web3Modal();
@@ -79,14 +79,14 @@ export default function Home() {
 			}
 		);
 		await transaction.wait();
-		loadNFTs(); //this should show the nft's that are not sold, technically speaking one's that are "still available to purchase"
+		loadNFTs(); //this should show the nft's that are not sold, technically speaking, "still available to purchase"
 	}
-	
+
 	if (loadingState === "loaded" && !nfts.length)
 		return (
 			<h1 className="px-20 py-10 text-3xl">No items in marketplace</h1>
 		);
-	
+
 	return (
 		<div>
 			<div className="flex justify-center">
