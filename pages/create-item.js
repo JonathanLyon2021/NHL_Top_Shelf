@@ -1,121 +1,156 @@
-import {useState} from 'react';
+import { useState, useRef } from "react";
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
-import {useRouter} from 'next/router';
-import {create as ipfsHttpClient} from 'ipfs-http-client';
-import Link from "next/link";
-
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0');
-
+import { useRouter } from "next/router";
+import { Web3Storage } from "web3.storage";
 import { nftaddress, nftmarketaddress } from "../config";
-
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
-import Market from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
+import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
+import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import Link from "next/link";
+require("dotenv").config();
 
 export default function CreateItem() {
+	const fileUpload = useRef(null);
+	const apiToken =
+		API_KEY;
+
+	const client = new Web3Storage({ token: apiToken });
+	// const fileInput = document.querySelector('input[type="file"]');
 	const [fileUrl, setFileUrl] = useState(null);
-	const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' });
+	const [formInput, updateFormInput] = useState({
+		price: "",
+		name: "",
+		description: "",
+	});
 	const router = useRouter();
 
 	async function onChange(e) {
-		const file = e.target.files[0];
+		console.log("fileUpload.current.files:", fileUpload.current.files);
 		try {
-			const added = await client.add(
-				file,
-				{
-					progress: (prog) => console.log(`received: ${prog}`)
-				}
-			)
-			const url = `https://ipfs.infura.io/ipfs/${added.path}`
+			// Pack files into a CAR and send to web3.storage
+			const rootCid = await client.put(fileUpload.current.files); // Promise<CIDString>
+			console.log("RootCID:", rootCid);
+			// Get info on the Filecoin deals that the CID is stored in
+			const info = await client.status(rootCid); // Promise<Status | undefined>
+			console.log("info:", info);
+			// Fetch and verify files from web3.storage
+			const res = await client.get(rootCid); // Promise<Web3Response | null>
+			const files = await res.files(); // Promise<Web3File[]>
+			console.log("files:", files);
+			//const added = await client.put(file, {
+			//	progress: (prog) => console.log(`received: ${prog}`),
+			//});
+
+			const url = `https://ipfs.io/ipfs/${info.cid}/${files[0].name}`;
+			console.log("url:", url);
 			setFileUrl(url);
 		} catch (e) {
-			console.log(e)
+			console.log("error:", e);
 		}
 	}
-	
-		//listing them item for sale
+
+	//listing them item for sale
 	async function createItem() {
 		const { name, description, price } = formInput;
 		if (!name || !description || !price || !fileUrl) return;
 		const data = JSON.stringify({
-			name, description, image: fileUrl
-		})
+			name,
+			description,
+			image: fileUrl,
+		});
 
 		try {
-			const added = await client.add(data);
-			const url = `https://ipfs.infura.io/ipfs/${added.path}`
-			*/ after file is uploaded to IPFS, pass the URL to save it on Polygon*/
-			createSale(url);
+			// Construct with token and endpoint
+			/*const added = await client.add(data);
+			const url =
+				`https://ipfs.infura.io/ipfs/${added.path}` *
+				/ after file is uploaded to IPFS, pass the URL to save it on Polygon;*/
+			//createSale(url);
 		} catch (e) {
-			console.log('Error uploading file: ', e)
+			console.log("Error uploading file: ", e);
 		}
 	}
 
-		//creating the sale connecting to the wallet with web3modal
 	async function createSale() {
-		
 		const web3Modal = new Web3Modal();
 		const connection = await web3Modal.connect();
 		const provider = new ethers.providers.Web3Provider(connection);
 		const signer = provider.getSigner();
 
+		//why are we interacting with two contracts here?
 		let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
 		let transaction = await contract.createToken(url);
 		let tx = await transaction.wait();
 
 		let event = tx.events[0];
-		let value = event.args[2]; 
+		let value = event.args[2]; //args[2]???? what is the 3rd position of args about??? : Jason
 		let tokenId = value.toNumber();
 
-		const price = ethers.utils.parseUnits(formInput.price, 'ether');
+		const price = ethers.utils.parseUnits(formInput.price, "ether");
 
 		contract = new ethers.Contract(nftmarketaddress, Market.abi, signer);
 		let listingPrice = await contract.getListingPrice();
 		listingPrice = listingPrice.toString();
 
-		transaction = await contract.createMarketItem(nftaddress, tokenId, price, { value: listingPrice });
+		transaction = await contract.createMarketItem(
+			nftaddress,
+			tokenId,
+			price,
+			{ value: listingPrice }
+		);
 		await transaction.wait();
-		router.push('/');
+		router.push("/");
 	}
-	
+
 	return (
 		<div className="flex justify-center">
 			<div className="w-1/2 flex flex-col pd-12">
 				<input
 					placeholder="Asset Name"
 					className="mt-8 border rounded p-4"
-					onChange={e => updateFormInput({ ...formInput, name: e.target.value })}
+					onChange={(e) =>
+						updateFormInput({ ...formInput, name: e.target.value })
+					}
 				/>
 				<textarea
 					placeholder="Asset Description"
 					className="mt-2 border rounded p-4"
-					onChange={e => updateFormInput({ ...formInput, description: e.target.value })}
+					onChange={(e) =>
+						updateFormInput({
+							...formInput,
+							description: e.target.value,
+						})
+					}
 				/>
 				<input
 					placeholder="Asset Price in Matic"
 					className="mt-2 border rounded p-4"
-					onChange={e => updateFormInput({ ...formInput, price: e.target.value })}
+					onChange={(e) =>
+						updateFormInput({ ...formInput, price: e.target.value })
+					}
 				/>
 				<input
+					ref={fileUpload}
 					type="file"
 					name="Asset"
 					className="my-4"
 					onChange={onChange}
-				/>	
-				//if they have uploaded an image, or a file url. We want to display/show it showing the file url
-				{
-					fileUrl && (
-						<img className="rounded mt-4" width="350" src={fileUrl} />
-					)
-				}
+				/>
+				//if they have uploaded an image, or a file url. We want to
+				display/show it showing the file url
+				{fileUrl && (
+					<img className="rounded mt-4" width="350" src={fileUrl} />
+				)}
 				<button
-				 onClick={createMarket}
-				 className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
-				 >
+					onClick={createItem}
+					className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
+				>
 					Create Digital Asset
-				 </button>
+				</button>
 			</div>
-				<p className="text-4xl font-bold">Create an NFT</p>
+
+			<p className="text-4xl font-bold">Create an NFT</p>
 		</div>
 	);
 }
+
