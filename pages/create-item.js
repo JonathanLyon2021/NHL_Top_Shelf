@@ -6,8 +6,7 @@ import { Web3Storage } from "web3.storage";
 import { nftaddress, nftmarketaddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import Link from "next/link";
-require("dotenv").config();
+import { API_KEY, PRIVATE_KEY, PROJECT_ID } from "../config";
 
 export default function CreateItem() {
 	const fileUpload = useRef(null);
@@ -83,7 +82,7 @@ export default function CreateItem() {
 		let tx = await transaction.wait();
 
 		let event = tx.events[0];
-		let value = event.args[2]; //args[2]???? what is the 3rd position of args about??? : Jason
+		let value = event.args[2]; 
 		let tokenId = value.toNumber();
 
 		const price = ethers.utils.parseUnits(formInput.price, "ether");
