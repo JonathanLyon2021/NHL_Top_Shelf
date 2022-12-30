@@ -2,11 +2,11 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-
-import { nftMarketAddress, nftAddress } from "../config"; //
-
+import { nftMarketAddress, nftAddress } from "../config"; 
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import { API_KEY, PRIVATE_KEY, PROJECT_ID } from "../config";
+
 
 export default function CreatorDashboard() {
 	const [nfts, setNfts] = useState([]);
