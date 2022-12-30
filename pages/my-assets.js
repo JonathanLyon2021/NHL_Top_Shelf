@@ -2,13 +2,11 @@ import {ethers } from "ethers"; // ethers is a library that allows us to interac
 import { useEffect, useState } from "react"; //useEffect is a hook that allows us to run code when the page loads
 import axios from "axios"; // axiios makes http requests & calls to the backend (API)
 import Web3Modal from "web3modal"; // web3modal is a library that allows us to connect to the wallet
-
-import { 
-	nftAddress, nftMarketAddress 
-} from "../config"; // import the address of the NFT contract and the NFTMarket contract
-	
+import { nftAddress, nftMarketAddress } from "../config"; // import the address of the NFT.sol & NFTMarket.sol
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json"; // import the NFT contract
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json"; // import the NFTMarket contract
+import { API_KEY, PRIVATE_KEY, PROJECT_ID } from "../config";
+
 
 export default function MyAssets() {
 	const [nfts, setNfts] = useState([]); // set the state of the NFTs to an empty array
@@ -21,7 +19,7 @@ export default function MyAssets() {
 			const connection = await web3Modal.connect()
 			const provider = new ethers.providers.Web3Provider(connection)
 			const signer = provider.getSigner() //we NEED to get the signer(msg.sender) to interact with the contract
-			//also using the signer to get a reference to the marketcontract, because we need to know the msg.sender.
+			//also using the signer to get a reference to the marketcontract, because we need to know the msg.sender?? askJason
 
 			//fetching the tokens/ALL the Market items
 			const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, signer)
@@ -29,7 +27,7 @@ export default function MyAssets() {
 			//^^we will automatically see the Wallet Modal pop up
 			const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider)
 			console.log("marketContract:", marketContract);
-			//We grab all the market data/NFT's, then two lines down we map over them to get the tokenURI & metadata, price, etc.
+			//We grab all the market data/NFT's, then two lines down we map over them to get the tokenURI & metadata, price, etc. askJason
 			const data = await marketContract.fetchMyNFTs()
 			console.log("data:", data);
 			const items = await Promise.all(data.map(async i => {
