@@ -18,9 +18,9 @@ The libraries used in this app are:
 
 ** Dev Dependency installs
 `npm install` <br>
-*tailwindcss@latest  <br>
-*postcss@latest   <br>
-*autoprefixer@latest  <br>
+*tailwindcss@latest*  <br>
+*postcss@latest*   <br>
+*autoprefixer@latest*  <br>
 
 Then after you install them run this command which creates two files that we'll need: A Tailwind CSS config file and a postcss.config.js
 `npx tailwindcss init -p`
