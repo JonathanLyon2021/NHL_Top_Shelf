@@ -5,22 +5,22 @@ This is a Dapp that I based off of NBA's Top Shot blockchain-based virtual tradi
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 The libraries used in this app are:
 `npm install`
-*ethers \n
-*hardhat \n
-*ethereum-waffle \n
-*chai \n 
-*web3modal \n
-*axios \n
-*ipfs-http-client \n
-*@nomiclabs/hardhat-waffle
-*@nomiclabs/hardhat-ethers
-*openzeppelin/contracts
+*ethers*  <br>
+*hardhat*  <br>
+*ethereum-waffle*  <br>
+*chai*  <br>
+*web3modal*  <br>
+*axios*  <br>
+*ipfs-http-client*  <br>
+*@nomiclabs/hardhat-waffle*  <br>
+*@nomiclabs/hardhat-ethers*  <br>
+*openzeppelin/contracts*  <br>
 
 ** Dev Dependency installs
-`npm install`
-*tailwindcss@latest
-*postcss@latest
-*autoprefixer@latest
+`npm install` <br>
+*tailwindcss@latest  <br>
+*postcss@latest   <br>
+*autoprefixer@latest  <br>
 
 Then after you install them run this command which creates two files that we'll need: A Tailwind CSS config file and a postcss.config.js
 `npx tailwindcss init -p`
@@ -35,7 +35,7 @@ npm run dev
 yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000] with your browser to see the result.
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
