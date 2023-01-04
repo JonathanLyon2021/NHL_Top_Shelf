@@ -2,18 +2,18 @@ import { useState, useRef } from "react";
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import { useRouter } from "next/router";
-import { Web3Storage } from "web3.storage";
-import { nftaddress, nftmarketaddress } from "../config";
+import { NFTStorage } from "nft.storage";
+import { nftAddress, nftMarketAddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import { API_KEY, PRIVATE_KEY, PROJECT_ID } from "../config";
 
 export default function CreateItem() {
 	const fileUpload = useRef(null);
-	const apiToken =
-		API_KEY;
-
-	const client = new Web3Storage({ token: apiToken });
+	//const apiKey =
+	//	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkxMzJkMThmZDQ4NjRlNzAxNjUwMzQwNThFOGQyNjkyOTREZDg5ZTgiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NzIwODM4MjQ1OTMsIm5hbWUiOiJuZnRUb2tlbiJ9._YJPyY76oRQ6zxCOf7SIu-7r9BvajqY_GVF8QzyLuDk";
+	const apiKey =
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGUwZGY2N0QwMDE3MjVlMDNGNzk1MzRBODVGNWJiYTVBYjE2Y2M2YTYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MjYwMTEzNDcwMSwibmFtZSI6Im5obFRvcFNoZWxmIn0.TR6Sb2qeZI-svNnSLbW7u7CTwRXwDOxKtRKVk4l0hhc";
+	const client = new NFTStorage({ token: apiKey });
 	// const fileInput = document.querySelector('input[type="file"]');
 	const [fileUrl, setFileUrl] = useState(null);
 	const [formInput, updateFormInput] = useState({
@@ -24,23 +24,11 @@ export default function CreateItem() {
 	const router = useRouter();
 
 	async function onChange(e) {
-		console.log("fileUpload.current.files:", fileUpload.current.files);
+		//console.log("file:", file);
+		//console.log("client:", client);
+		console.log("fileUpload.current.files:", fileUpload.current.files[0]);
 		try {
-			// Pack files into a CAR and send to web3.storage
-			const rootCid = await client.put(fileUpload.current.files); // Promise<CIDString>
-			console.log("RootCID:", rootCid);
-			// Get info on the Filecoin deals that the CID is stored in
-			const info = await client.status(rootCid); // Promise<Status | undefined>
-			console.log("info:", info);
-			// Fetch and verify files from web3.storage
-			const res = await client.get(rootCid); // Promise<Web3Response | null>
-			const files = await res.files(); // Promise<Web3File[]>
-			console.log("files:", files);
-			//const added = await client.put(file, {
-			//	progress: (prog) => console.log(`received: ${prog}`),
-			//});
-
-			const url = `https://ipfs.io/ipfs/${info.cid}/${files[0].name}`;
+			const url = URL.createObjectURL(fileUpload.current.files[0]);
 			console.log("url:", url);
 			setFileUrl(url);
 		} catch (e) {
@@ -48,54 +36,65 @@ export default function CreateItem() {
 		}
 	}
 
-	//listing them item for sale
+	//creates item and saves it to ipfs
 	async function createItem() {
 		const { name, description, price } = formInput;
 		if (!name || !description || !price || !fileUrl) return;
-		const data = JSON.stringify({
-			name,
-			description,
-			image: fileUrl,
-		});
 
 		try {
-			// Construct with token and endpoint
-			/*const added = await client.add(data);
-			const url =
-				`https://ipfs.infura.io/ipfs/${added.path}` *
-				/ after file is uploaded to IPFS, pass the URL to save it on Polygon;*/
-			//createSale(url);
+			const { name, type } = fileUpload.current.files[0];
+			const metadata = await client.store({
+				name,
+				description,
+				image: new File(fileUpload.current.files, name, {
+					type,
+				}),
+				properties: {
+					price,
+				},
+			});
+			const uploaded = metadata.embed();
+
+			createSale(uploaded.image.href);
 		} catch (e) {
 			console.log("Error uploading file: ", e);
 		}
 	}
 
-	async function createSale() {
+	async function createSale(url) {
 		const web3Modal = new Web3Modal();
 		const connection = await web3Modal.connect();
 		const provider = new ethers.providers.Web3Provider(connection);
 		const signer = provider.getSigner();
 
 		//why are we interacting with two contracts here?
-		let contract = new ethers.Contract(nftaddress, NFT.abi, signer);
+		let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
 		let transaction = await contract.createToken(url);
 		let tx = await transaction.wait();
+		console.log("tx:", tx);
 
 		let event = tx.events[0];
-		let value = event.args[2]; 
+		console.log("event:", event);
+
+		let value = event.args[2];
+		console.log("value:", value);
+
 		let tokenId = value.toNumber();
+		console.log("tokenId:", tokenId);
 
 		const price = ethers.utils.parseUnits(formInput.price, "ether");
 
-		contract = new ethers.Contract(nftmarketaddress, Market.abi, signer);
+		contract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
 		let listingPrice = await contract.getListingPrice();
 		listingPrice = listingPrice.toString();
 
 		transaction = await contract.createMarketItem(
-			nftaddress,
+			nftAddress,
 			tokenId,
 			price,
-			{ value: listingPrice }
+			{
+				value: listingPrice,
+			}
 		);
 		await transaction.wait();
 		router.push("/");
