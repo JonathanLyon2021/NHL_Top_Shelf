@@ -9,10 +9,7 @@ import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 
 export default function CreateItem() {
 	const fileUpload = useRef(null);
-	//const apiKey =
-	//	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkxMzJkMThmZDQ4NjRlNzAxNjUwMzQwNThFOGQyNjkyOTREZDg5ZTgiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NzIwODM4MjQ1OTMsIm5hbWUiOiJuZnRUb2tlbiJ9._YJPyY76oRQ6zxCOf7SIu-7r9BvajqY_GVF8QzyLuDk";
-	const apiKey =
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGUwZGY2N0QwMDE3MjVlMDNGNzk1MzRBODVGNWJiYTVBYjE2Y2M2YTYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MjYwMTEzNDcwMSwibmFtZSI6Im5obFRvcFNoZWxmIn0.TR6Sb2qeZI-svNnSLbW7u7CTwRXwDOxKtRKVk4l0hhc";
+	//const apiKey!!!
 	const client = new NFTStorage({ token: apiKey });
 	// const fileInput = document.querySelector('input[type="file"]');
 	const [fileUrl, setFileUrl] = useState(null);
