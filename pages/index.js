@@ -1,10 +1,8 @@
-import { ethers } from "ethers";
+import { ethers, providers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-
-import { nftaddress, nftmarketaddress } from "../config";
-
+import { nftAddress, nftMarketAddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 
@@ -17,42 +15,49 @@ export default function Home() {
 	}, []);
 
 	async function loadNFTs() {
-		const provider = new ethers.providers.JsonRpcProvider();
+		const INFURA_PROJECT_ID = "460a2af81be44b31aed0e928f26cbc53";
+		const infuraProvider = new providers.InfuraProvider(
+			"goerli",
+			INFURA_PROJECT_ID
+		); //why dont we need like infura provider method? : ask J
 		const tokenContract = new ethers.Contract(
-			nftaddress,
+			nftAddress,
 			NFT.abi,
-			provider
+			infuraProvider
 		);
 		const marketContract = new ethers.Contract(
-			nftmarketaddress,
+			nftMarketAddress,
 			Market.abi,
-			provider
+			infuraProvider
 		);
 		const data = await marketContract.fetchMarketItems();
-
 		//this is a json representation from ipfs for instanceof(description, image, name, etc.)
 		const items = await Promise.all(
 			data.map(async (i) => {
-				const tokenUri = await tokenContract.tokenURI(i.tokenId);
+				const tokenId = Number(i.itemId.toString());
+				const tokenUri = await tokenContract.tokenURI(tokenId);
 				const meta = await axios.get(tokenUri);
 				let price = ethers.utils.formatUnits(
 					i.price.toString(),
 					"ether"
 				);
+				const link = meta.data?.image?.split("ipfs://")[1];
+				const url = `https://nftstorage.link/ipfs/${link}`;
+
 				//We are mapping over the items array, setting this stuff to the item.
 				let item = {
 					price,
 					tokenId: i.tokenId.toNumber(),
 					seller: i.seller,
 					owner: i.owner,
-					image: meta.data.image,
+					image: url || " ",
 					name: meta.data.name,
 					description: meta.data.description,
 				};
 				return item;
 			})
 		);
-		setNfts(items); // sets the new 
+		setNfts(items); 
 		setLoadingState("loaded"); //set loading state to loaded
 	}
 
@@ -64,7 +69,7 @@ export default function Home() {
 
 		const signer = provider.getSigner();
 		const contract = new ethers.Contract(
-			nftmarketaddress,
+			nftMarketAddress,
 			Market.abi,
 			signer
 		);
@@ -72,7 +77,7 @@ export default function Home() {
 		const price = ethers.utils.parseUnits(nft.price.toString(), "ether");
 
 		const transaction = await contract.createMarketSale(
-			nftaddress,
+			nftAddress,
 			nft.tokenId,
 			{
 				value: price,
