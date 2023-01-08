@@ -9,7 +9,10 @@ import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 
 export default function CreateItem() {
 	const fileUpload = useRef(null);
-	//const apiKey!!!
+	//const apiKey =
+	//	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkxMzJkMThmZDQ4NjRlNzAxNjUwMzQwNThFOGQyNjkyOTREZDg5ZTgiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NzIwODM4MjQ1OTMsIm5hbWUiOiJuZnRUb2tlbiJ9._YJPyY76oRQ6zxCOf7SIu-7r9BvajqY_GVF8QzyLuDk";
+	const apiKey =
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGUwZGY2N0QwMDE3MjVlMDNGNzk1MzRBODVGNWJiYTVBYjE2Y2M2YTYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MjYwMTEzNDcwMSwibmFtZSI6Im5obFRvcFNoZWxmIn0.TR6Sb2qeZI-svNnSLbW7u7CTwRXwDOxKtRKVk4l0hhc";
 	const client = new NFTStorage({ token: apiKey });
 	// const fileInput = document.querySelector('input[type="file"]');
 	const [fileUrl, setFileUrl] = useState(null);
@@ -21,15 +24,11 @@ export default function CreateItem() {
 	const router = useRouter();
 
 	async function onChange(e) {
-		//console.log("file:", file);
-		//console.log("client:", client);
-		console.log("fileUpload.current.files:", fileUpload.current.files[0]);
 		try {
 			const url = URL.createObjectURL(fileUpload.current.files[0]);
-			console.log("url:", url);
 			setFileUrl(url);
 		} catch (e) {
-			console.log("error:", e);
+			console.log("Error:", e);
 		}
 	}
 
@@ -40,6 +39,9 @@ export default function CreateItem() {
 
 		try {
 			const { name, type } = fileUpload.current.files[0];
+			console.log("new File:", new File(fileUpload.current.files, name, {
+				type,
+			}), )
 			const metadata = await client.store({
 				name,
 				description,
@@ -50,35 +52,29 @@ export default function CreateItem() {
 					price,
 				},
 			});
-			const uploaded = metadata.embed();
+			const link = metadata.url.split("ipfs://")[1];
+			const url = `https://nftstorage.link/ipfs/${link}`;
 
-			createSale(uploaded.image.href);
+			//createSale(uploaded.image.href);
+			console.log("url:", url);
+			createSale(url);
 		} catch (e) {
 			console.log("Error uploading file: ", e);
 		}
 	}
 
-	async function createSale(url) {
+	async function createSale(metadata) {
 		const web3Modal = new Web3Modal();
 		const connection = await web3Modal.connect();
 		const provider = new ethers.providers.Web3Provider(connection);
 		const signer = provider.getSigner();
 
-		//why are we interacting with two contracts here?
 		let contract = new ethers.Contract(nftAddress, NFT.abi, signer);
-		let transaction = await contract.createToken(url);
+		let transaction = await contract.createToken(metadata);
 		let tx = await transaction.wait();
-		console.log("tx:", tx);
-
 		let event = tx.events[0];
-		console.log("event:", event);
-
 		let value = event.args[2];
-		console.log("value:", value);
-
 		let tokenId = value.toNumber();
-		console.log("tokenId:", tokenId);
-
 		const price = ethers.utils.parseUnits(formInput.price, "ether");
 
 		contract = new ethers.Contract(nftMarketAddress, Market.abi, signer);
@@ -118,7 +114,7 @@ export default function CreateItem() {
 					}
 				/>
 				<input
-					placeholder="Asset Price in Matic"
+					placeholder="Asset Price in Goerli"
 					className="mt-2 border rounded p-4"
 					onChange={(e) =>
 						updateFormInput({ ...formInput, price: e.target.value })
@@ -131,8 +127,6 @@ export default function CreateItem() {
 					className="my-4"
 					onChange={onChange}
 				/>
-				//if they have uploaded an image, or a file url. We want to
-				display/show it showing the file url
 				{fileUrl && (
 					<img className="rounded mt-4" width="350" src={fileUrl} />
 				)}
@@ -148,4 +142,5 @@ export default function CreateItem() {
 		</div>
 	);
 }
+
 
