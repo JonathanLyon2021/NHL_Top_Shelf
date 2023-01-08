@@ -2,11 +2,9 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-import { nftMarketAddress, nftAddress } from "../config"; 
+import { nftMarketAddress, nftAddress } from "../config";
 import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
-import { API_KEY, PRIVATE_KEY, PROJECT_ID } from "../config";
-
 
 export default function CreatorDashboard() {
 	const [nfts, setNfts] = useState([]);
@@ -33,16 +31,20 @@ export default function CreatorDashboard() {
 			NFT.abi,
 			provider
 		);
-		const data = await marketContract.fetchItemsListed();
-
+		const data = await marketContract.fetchItemsCreated();
+			console.log("data:", data);
+			//console.log(nfts[0].image)      // This is the image address in the object `ipfs://${CID}` 
 		const items = await Promise.all(
 			data.map(async (i) => {
 				const tokenUri = await tokenContract.tokenURI(i.tokenId);
 				const meta = await axios.get(tokenUri);
+				const image = (i.image);
+				console.log(image);
 				let price = ethers.utils.formatUnits(
 					i.price.toString(),
 					"ether"
 				);
+				console.log("items:", items);
 				let item = {
 					price,
 					tokenId: i.tokenId.toNumber(),
@@ -71,8 +73,8 @@ export default function CreatorDashboard() {
 						<div
 							key={i}
 							className="border shadow rounded-xl overflow-hidden"
-						>
-							<img src={nft.image} className="rounded" />
+						> 
+							<img src={nft.image} className="rounded" />  
 							<div className="p-4 bg-black">
 								<p className="text-2xl font-bold text-white">
 									Price - {nft.price} Eth
@@ -107,3 +109,4 @@ export default function CreatorDashboard() {
 		</div>
 	);
 }
+
