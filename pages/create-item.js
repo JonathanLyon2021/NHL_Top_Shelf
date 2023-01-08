@@ -9,12 +9,9 @@ import Market from "../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 
 export default function CreateItem() {
 	const fileUpload = useRef(null);
-	//const apiKey =
-	//	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDkxMzJkMThmZDQ4NjRlNzAxNjUwMzQwNThFOGQyNjkyOTREZDg5ZTgiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NzIwODM4MjQ1OTMsIm5hbWUiOiJuZnRUb2tlbiJ9._YJPyY76oRQ6zxCOf7SIu-7r9BvajqY_GVF8QzyLuDk";
 	const apiKey =
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGUwZGY2N0QwMDE3MjVlMDNGNzk1MzRBODVGNWJiYTVBYjE2Y2M2YTYiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MjYwMTEzNDcwMSwibmFtZSI6Im5obFRvcFNoZWxmIn0.TR6Sb2qeZI-svNnSLbW7u7CTwRXwDOxKtRKVk4l0hhc";
+		"Insert API KEY here";
 	const client = new NFTStorage({ token: apiKey });
-	// const fileInput = document.querySelector('input[type="file"]');
 	const [fileUrl, setFileUrl] = useState(null);
 	const [formInput, updateFormInput] = useState({
 		price: "",
@@ -32,7 +29,7 @@ export default function CreateItem() {
 		}
 	}
 
-	//creates item and saves it to ipfs
+	//Creates an item and saves it to ipfs
 	async function createItem() {
 		const { name, description, price } = formInput;
 		if (!name || !description || !price || !fileUrl) return;
@@ -54,9 +51,6 @@ export default function CreateItem() {
 			});
 			const link = metadata.url.split("ipfs://")[1];
 			const url = `https://nftstorage.link/ipfs/${link}`;
-
-			//createSale(uploaded.image.href);
-			console.log("url:", url);
 			createSale(url);
 		} catch (e) {
 			console.log("Error uploading file: ", e);
